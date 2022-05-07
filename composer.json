@@ -1,0 +1,22 @@
+{
+    "name": "tomwilford/lets-start-cmd",
+    "description": "Template for a command line package",
+    "keywords": [],
+    "homepage": "https://jollyblueman.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tom Wilford",
+            "homepage": "https://jollyblueman.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "hello@jollyblueman.com"
+    },
+    "autoload": {
+        "psr-4": {
+            "Wilf\\LetsStart\\": "src/"
+        }
+    }
+}
