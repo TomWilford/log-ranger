@@ -16,7 +16,18 @@
     },
     "autoload": {
         "psr-4": {
-            "Wilf\\LetsStart\\": "src/"
+            "Wilf\\Console\\": "src/Console/",
+            "Wilf\\Tests\\Console\\": "tests/Console/"
         }
+    },
+    "require": {
+        "symfony/console": "^6.0"
+    },
+    "require-dev": {
+        "symfony/test-pack": "^1.0",
+        "phpunit/phpunit": "^9.5",
+        "symfony/framework-bundle": "^6.0",
+        "symfony/dotenv": "^6.0",
+        "symfony/yaml": "^6.0"
     }
 }
