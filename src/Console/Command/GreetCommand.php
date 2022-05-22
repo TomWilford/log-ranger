@@ -24,7 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *      - aliases     = Alternative ways of calling the command.
  *      - hidden      = Visibility of the command in help pages.
  *
- * @author Tom Wilford <hello@jollyblueman.com
+ * @author Tom Wilford <hello@jollyblueman.com>
  */
 #[AsCommand(
     name: 'console:greet',
