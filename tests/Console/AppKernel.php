@@ -1,6 +1,6 @@
 <?php
 
-namespace Wilf\Tests;
+namespace Wilf\Tests\Console;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 

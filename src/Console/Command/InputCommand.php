@@ -6,6 +6,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 
 class InputCommand extends ConsoleCommand
 {
@@ -21,13 +22,11 @@ class InputCommand extends ConsoleCommand
             ->addOption('option', 'o', InputArgument::OPTIONAL, "An optional option.");
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln(['Thanks for that!', 'Now lets see...']);
 
-        $section = $output->section();
-
-        $section->writeln('Your name is ' . $input->getArgument('name') . '!');
+        $output->writeln('Your name is ' . $input->getArgument('name') . '!');
 
         return Command::SUCCESS;
     }

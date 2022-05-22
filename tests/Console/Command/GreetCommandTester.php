@@ -6,24 +6,20 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class InputCommandTester extends KernelTestCase
+class GreetCommandTester extends KernelTestCase
 {
     public function testExecute()
     {
         $kernel = self::bootKernel();
         $application = new Application($kernel);
-        $application->add(new \Wilf\Console\Command\InputCommand()); // php run console:input
+        $application->add(new \Wilf\Console\Command\GreetCommand()); // php run console:greet
 
-        $command = $application->find('console:input');
+        $command = $application->find('console:greet');
         $commandTester = new CommandTester($command);
-        $commandTester->execute([
-            'name' => 'Tom',
-            '--option' => 'Yes'
-        ]);
-
+        $commandTester->execute([]);
         $commandTester->assertCommandIsSuccessful();
 
         $output = $commandTester->getDisplay();
-        $this->assertStringContainsString('Your name is Tom!', $output);
+        $this->assertStringContainsString('Hello there!', $output);
     }
 }
