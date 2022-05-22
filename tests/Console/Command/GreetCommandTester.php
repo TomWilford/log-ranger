@@ -15,6 +15,7 @@ class GreetCommandTester extends KernelTestCase
         $application->add(new \Wilf\Console\Command\GreetCommand()); // php run console:greet
 
         $command = $application->find('console:greet');
+
         $commandTester = new CommandTester($command);
         $commandTester->execute([]);
         $commandTester->assertCommandIsSuccessful();
