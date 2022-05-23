@@ -12,6 +12,7 @@ class InputCommandTester extends KernelTestCase
     {
         $kernel = self::bootKernel();
         $application = new Application($kernel);
+        $application->setAutoExit(false);
         $application->add(new \Wilf\Console\Command\InputCommand()); // php run console:input
 
         $command = $application->find('console:input');

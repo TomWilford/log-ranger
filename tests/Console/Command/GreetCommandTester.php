@@ -12,6 +12,7 @@ class GreetCommandTester extends KernelTestCase
     {
         $kernel = self::bootKernel();
         $application = new Application($kernel);
+        $application->setAutoExit(false);
         $application->add(new \Wilf\Console\Command\GreetCommand()); // php run console:greet
 
         $command = $application->find('console:greet');
