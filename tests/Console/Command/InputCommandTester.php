@@ -2,29 +2,22 @@
 
 namespace Wilf\Tests\Console\Command;
 
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Console\Tester\CommandTester;
+use PHPUnit\Framework\TestCase;
+use Wilf\Console\Command\GreetCommand;
+use Wilf\Console\Command\InputCommand;
+use Zenstruck\Console\Test\TestCommand;
 
-class InputCommandTester extends KernelTestCase
+class InputCommandTester extends TestCase
 {
     public function testExecute()
     {
-        $kernel = self::bootKernel();
-        $application = new Application($kernel);
-        $application->setAutoExit(false);
-        $application->add(new \Wilf\Console\Command\InputCommand()); // php run console:input
-
-        $command = $application->find('console:input');
-        $commandTester = new CommandTester($command);
-        $commandTester->execute([
-            'name' => 'Tom',
-            '--option' => 'Yes'
-        ]);
-
-        $commandTester->assertCommandIsSuccessful();
-
-        $output = $commandTester->getDisplay();
-        $this->assertStringContainsString('Your name is Tom!', $output);
+        TestCommand::for(new InputCommand())
+            ->splitOutputStreams()
+            ->addArgument('Tom')
+            ->addOption('option')
+            ->execute()
+            ->assertSuccessful()
+            ->assertOutputContains('Your name is Tom!')
+        ;
     }
 }

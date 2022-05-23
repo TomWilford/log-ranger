@@ -53,7 +53,8 @@ class GreetCommand extends ConsoleCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln('Hello there!');
+        $section = $output->section();
+        $section->write('Hello there!');
 
         return Command::SUCCESS;
     }

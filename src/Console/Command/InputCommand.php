@@ -12,6 +12,7 @@ namespace Wilf\Console\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
@@ -49,7 +50,8 @@ class InputCommand extends ConsoleCommand
             ->setHidden(false)
             ->setAliases(["console:test"])
             ->addArgument('name', InputArgument::REQUIRED, 'Your name please?')
-            ->addOption('option', 'o', InputArgument::OPTIONAL, "An optional option.");
+            ->addOption('option', 'o', InputOption::VALUE_NONE, "An optional option.")
+        ;
     }
 
     /**
