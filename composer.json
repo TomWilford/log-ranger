@@ -24,10 +24,7 @@
         "symfony/console": "^6.0"
     },
     "require-dev": {
-        "symfony/test-pack": "^1.0",
         "phpunit/phpunit": "^9.5",
-        "symfony/framework-bundle": "^6.0",
-        "symfony/dotenv": "^6.0",
-        "symfony/yaml": "^6.0"
+        "zenstruck/console-test": "^1.3"
     }
 }
