@@ -39,6 +39,9 @@ class InputCommand extends ConsoleCommand
      */
     protected static $defaultDescription = "Example command with inputs.";
 
+    private string $name;
+    protected int $switch;
+
     /**
      * Sets further info about the command and enables user input.
      *
@@ -50,12 +53,47 @@ class InputCommand extends ConsoleCommand
             ->setHidden(false)
             ->setAliases(["console:test"])
             ->addArgument('name', InputArgument::REQUIRED, 'Your name please?')
-            ->addOption('option', 'o', InputOption::VALUE_NONE, "An optional option.")
+            ->addOption('switch', 's', InputOption::VALUE_NONE, "An optional option.")
         ;
     }
 
     /**
-     * Runs logic and can output messages when command is called.
+     * Executes first.
+     * Initialises variables used in the rest of the command methods.
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return void
+     */
+    protected function initialize(InputInterface $input, OutputInterface $output): void
+    {
+        $this->name   = $input->getArgument('name') ?? "";
+        $this->switch = $input->getOption('switch') ?? 0;
+    }
+
+    /**
+     * Executes second.
+     * Used to check if the options/arguments are set, and ask for them. After this point
+     * missing options/arguments cause an error.
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return void
+     */
+    protected function interact(InputInterface $input, OutputInterface $output): void
+    {
+        if (!$this->name) {
+            $output->writeln('Your name is required for me to repeat it back to you.');
+        }
+
+        if ($this->switch == 0) {
+            $output->writeln('No option?');
+        }
+    }
+
+    /**
+     * Executes last.
+     * Runs logic and can output messages when command is called. Must return an integer.
      *
      * @param InputInterface $input
      * @param OutputInterface $output
@@ -65,7 +103,7 @@ class InputCommand extends ConsoleCommand
     {
         $output->writeln(['Thanks for that!', 'Now lets see...']);
 
-        $output->writeln('Your name is ' . $input->getArgument('name') . '!');
+        $output->writeln('Your name is ' . $this->name. '!');
 
         return Command::SUCCESS;
     }

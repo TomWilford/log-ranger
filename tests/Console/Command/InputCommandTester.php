@@ -13,7 +13,7 @@ class InputCommandTester extends TestCase
         TestCommand::for(new InputCommand())
             ->splitOutputStreams()
             ->addArgument('Tom')
-            ->addOption('option')
+            ->addOption('switch')
             ->execute()
             ->assertSuccessful()
             ->assertOutputContains('Your name is Tom!')
