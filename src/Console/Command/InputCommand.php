@@ -49,7 +49,8 @@ class InputCommand extends ConsoleCommand
             ->setHidden(false)
             ->setAliases(["console:test"])
             ->addArgument('name', InputArgument::REQUIRED, 'Your name please?')
-            ->addOption('option', 'o', InputArgument::OPTIONAL, "An optional option.");
+            ->addOption('option', 'o', InputArgument::OPTIONAL, "An optional option.")
+        ;
     }
 
     /**
