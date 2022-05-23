@@ -12,7 +12,10 @@ class InputCommandTester extends TestCase
     public function testExecute()
     {
         TestCommand::for(new InputCommand())
-            ->execute('Tom --option')
+            ->splitOutputStreams()
+            ->addArgument('Tom')
+            ->addOption('option')
+            ->execute()
             ->assertSuccessful()
             ->assertOutputContains('Your name is Tom!')
         ;
