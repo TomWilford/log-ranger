@@ -14,6 +14,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
@@ -42,6 +43,7 @@ class InputCommand extends ConsoleCommand
 
     private string $name;
     private int $switch;
+    private string $languages;
 
     /**
      * Sets further info about the command and enables user input.
@@ -53,9 +55,27 @@ class InputCommand extends ConsoleCommand
         $this->setHelp("Let me figure out the options first")
             ->setHidden(false)
             ->setAliases(["console:test"])
-            ->addArgument('firstname', InputArgument::REQUIRED, 'Your name please?')
-            ->addArgument('lastname', InputArgument::OPTIONAL, 'Your surname too?')
-            ->addOption('switch', 's', InputOption::VALUE_NONE, "A switch... Press it?")
+            ->addArgument(
+                'name',
+                InputArgument::REQUIRED,
+                'Your firstname please?'
+            )
+            ->addArgument(
+                'lastname',
+                InputArgument::OPTIONAL,
+                'Your surname too? Your choice!'
+            )
+            ->addArgument(
+                'languages',
+                 InputArgument::IS_ARRAY | InputArgument::OPTIONAL,
+                'Your favourite languages?'
+            )
+            ->addOption(
+                'switch',
+                's',
+                InputOption::VALUE_NONE,
+                "A switch... Press it?"
+            )
         ;
     }
 
@@ -69,10 +89,12 @@ class InputCommand extends ConsoleCommand
      */
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
-        $this->name = filter_var($input->getArgument('firstname'), FILTER_SANITIZE_ADD_SLASHES);
-        $lastname   = filter_var($input->getArgument('lastname'), FILTER_SANITIZE_ADD_SLASHES);
-        if ($lastname) {
+        $this->name = filter_var($input->getArgument('name'), FILTER_SANITIZE_ADD_SLASHES);
+        if ($lastname = filter_var($input->getArgument('lastname'), FILTER_SANITIZE_ADD_SLASHES)) {
             $this->name .= ' ' . $lastname;
+        }
+        if ($languages = filter_var_array($input->getArgument('languages'), FILTER_SANITIZE_ADD_SLASHES)) {
+            $this->languages = substr_replace(implode(', ', $languages), ' and', -strpos(implode(', ', $languages), ',', -(strlen($languages[count($languages)]) + 1)) );
         }
         $this->switch = filter_var($input->getOption('switch'), FILTER_VALIDATE_INT);
     }
@@ -93,7 +115,13 @@ class InputCommand extends ConsoleCommand
         }
 
         if (!$this->switch) {
-            $output->writeln('No \'switch\' this time?');
+            $output->writeln('No \'switch\' this time? No problem!');
+        }
+
+        if ($this->languages) {
+            if (str_contains($this->languages, 'php')) {
+                $output->writeln('A fine choice of languages!');
+            }
         }
     }
 
@@ -109,26 +137,33 @@ class InputCommand extends ConsoleCommand
     {
         // Output feedback
         $output->writeln(['Thanks for that!', 'Now lets see...']);
-        $output->writeln('Your name is ' . $this->name. '!');
+        $output->writeln('Your name is "' . $this->name. '"?');
 
-        $command = $this->getApplication()->find('console:greet');
-        $arguments = [
+        $greetCommand = $this->getApplication()->find('console:greet');
+        $greetCommandInput = new ArrayInput([
             'name' => $this->name
-        ];
-        $greetCommandInput = new ArrayInput($arguments);
+        ]);
+
+        // Calling console:greet to say hello
+        $returnCode = Command::SUCCESS;
         try {
-            $returnCode = $command->run($greetCommandInput, $output);
+            // Replace $output below with new NullOutput() to suppress the command's output
+            $returnCode = $greetCommand->run($greetCommandInput, $output);
         } catch (\Throwable $e) {
             $output->writeln([
                 'Whoops, forgot your name there for a second.',
                 'Can you tell me again...',
-                'But this time try not to' . $e->getMessage(),
+                'But this time try not to ' . $e->getMessage(),
                 ]);
         }
-
         if ($returnCode != Command::SUCCESS) {
             return Command::FAILURE;
         }
+
+        if ($this->languages) {
+            $output->writeln('So you like ' .$this->languages . '?');
+        }
+
         return Command::SUCCESS;
     }
 }
