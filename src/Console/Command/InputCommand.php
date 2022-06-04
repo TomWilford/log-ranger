@@ -9,7 +9,9 @@
 
 namespace Wilf\Console\Command;
 
+use SebastianBergmann\CodeCoverage\Report\PHP;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -42,8 +44,10 @@ class InputCommand extends ConsoleCommand
     protected static $defaultDescription = "Example command with inputs.";
 
     private string $name;
-    private int $switch;
     private string $languages;
+    private int $switch;
+    private int $number;
+    private bool $waffle;
 
     /**
      * Sets further info about the command and enables user input.
@@ -76,6 +80,19 @@ class InputCommand extends ConsoleCommand
                 InputOption::VALUE_NONE,
                 "A switch... Press it?"
             )
+            ->addOption(
+                'number',
+                '#',
+                InputOption::VALUE_REQUIRED,
+                'Your favourite number?',
+            )
+            ->addOption(
+                'waffle',
+                'w',
+                InputOption::VALUE_OPTIONAL,
+                'Do you want waffle with your output?',
+                false
+            )
         ;
     }
 
@@ -93,10 +110,45 @@ class InputCommand extends ConsoleCommand
         if ($lastname = filter_var($input->getArgument('lastname'), FILTER_SANITIZE_ADD_SLASHES)) {
             $this->name .= ' ' . $lastname;
         }
-        if ($languages = filter_var_array($input->getArgument('languages'), FILTER_SANITIZE_ADD_SLASHES)) {
-            $this->languages = substr_replace(implode(', ', $languages), ' and', -strpos(implode(', ', $languages), ',', -(strlen($languages[count($languages)]) + 1)) );
+
+        $languages = filter_var_array($input->getArgument('languages'), FILTER_SANITIZE_ADD_SLASHES);
+        if ($languages && count($languages) == 1) {
+            $this->languages = $languages[0];
+        } else if ($languages && count($languages) == 2) {
+            $this->languages = $languages[0] . ' and ' . $languages[1];
+        } else {
+            $this->languages =
+                $languages ?
+                    substr_replace(
+                        $string = implode(', ', $languages),
+                        ' and',
+                        strpos($string, ',', (strlen($languages[count($languages) - 1]) + 1)),
+                        1
+                    ) :
+                    false
+            ;
         }
+
         $this->switch = filter_var($input->getOption('switch'), FILTER_VALIDATE_INT);
+        $this->number = filter_var($input->getOption('number'), FILTER_VALIDATE_INT);
+
+        $waffle = $input->getOption('waffle');
+        if (false === $waffle) {
+            // Option not passed
+            // Didn't know they could specify... probably want waffle!
+            $this->waffle = true;
+        } elseif (null === $waffle) {
+            // Option passed with no value
+            // Knew they could specify but didn't... probably want waffle!!
+            $this->waffle = true;
+        } else {
+            // Option passed with values
+            // Anything other than no means waffle!
+            $this->waffle = true;
+            if ('no' === strtolower($waffle)) {
+                $this->waffle = false;
+            }
+        }
     }
 
     /**
@@ -110,18 +162,31 @@ class InputCommand extends ConsoleCommand
      */
     protected function interact(InputInterface $input, OutputInterface $output): void
     {
-        if (!$this->name) {
-            $output->writeln('Your name is required for me to repeat it back to you.');
+        $waffle = $this->waffle;
+
+        $outputStyle = new OutputFormatterStyle('#4F5B93', '#8892BF', ['bold', 'blink']);
+        $output->getFormatter()->setStyle('truth', $outputStyle);
+
+        if (!$this->name && $waffle) {
+            $output->writeln('<info>Your name is required for me to repeat it back to you.</info>');
         }
 
-        if (!$this->switch) {
-            $output->writeln('No \'switch\' this time? No problem!');
-        }
-
-        if ($this->languages) {
+        if ($this->languages && $waffle) {
             if (str_contains($this->languages, 'php')) {
-                $output->writeln('A fine choice of languages!');
+                $output->writeln('<truth>A fine choice of languages!</truth>');
             }
+        }
+
+        if (!$this->switch && $waffle) {
+            $output->writeln('<comment>No \'switch\' this time? No problem!</comment>');
+        }
+
+        if (!$this->number && $waffle) {
+            $output->writeln(['<question>Go on, what\' your favourite number?</question>']);
+        }
+
+        if (!$this->waffle) {
+            $output->writeln('<error>No waffle? Really? :(</error>');
         }
     }
 
@@ -135,33 +200,54 @@ class InputCommand extends ConsoleCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $waffle    = $this->waffle;
+        $name      = $this->name;
+        $number    = $this->number;
+        $switch    = $this->switch;;
+        $languages = $this->languages;
+
         // Output feedback
-        $output->writeln(['Thanks for that!', 'Now lets see...']);
-        $output->writeln('Your name is "' . $this->name. '"?');
+        if ($waffle) {
+            $output->writeln(['Thanks for that!', 'Now lets see...']);
+        }
 
-        $greetCommand = $this->getApplication()->find('console:greet');
-        $greetCommandInput = new ArrayInput([
-            'name' => $this->name
-        ]);
+        $message = $waffle ? '<question>Your name is "' . $name . '"?</question>' : 'Name: ' . $name;
+        $output->writeln($message);
 
-        // Calling console:greet to say hello
-        $returnCode = Command::SUCCESS;
-        try {
-            // Replace $output below with new NullOutput() to suppress the command's output
-            $returnCode = $greetCommand->run($greetCommandInput, $output);
-        } catch (\Throwable $e) {
-            $output->writeln([
-                'Whoops, forgot your name there for a second.',
-                'Can you tell me again...',
-                'But this time try not to ' . $e->getMessage(),
+        if ($waffle) {
+            $greetCommand = $this->getApplication()->find('console:greet');
+            $greetCommandInput = new ArrayInput([
+                'name' => $name
+            ]);
+
+            // Calling console:greet to say hello
+            $returnCode = Command::SUCCESS;
+            try {
+                // Replace $output below with new NullOutput() to suppress the command's output
+                $returnCode = $greetCommand->run($greetCommandInput, $output);
+            } catch (\Throwable $e) {
+                $output->writeln([
+                    '<error>Whoops, forgot your name there for a second.</error>',
+                    '<error>Can you tell me again...</error>',
+                    '<error>But this time try not to: </error>' . PHP_EOL . $e->getMessage(),
                 ]);
-        }
-        if ($returnCode != Command::SUCCESS) {
-            return Command::FAILURE;
+            }
+            if ($returnCode != Command::SUCCESS) {
+                return Command::FAILURE;
+            }
         }
 
-        if ($this->languages) {
-            $output->writeln('So you like ' .$this->languages . '?');
+        $message = $waffle ? '<comment>' . $number . ', eh? That\'s a good one.</comment>' : 'Number: ' . $number;
+        $output->writeln($message);
+
+        if ($switch) {
+            $message = $waffle ? '<comment>Ah, and you found the switch.</comment>' : 'Switch: Found';
+            $output->writeln($message);
+        }
+
+        if ($languages) {
+            $message = $waffle ? '<question>So you like ' .$languages . '?</question>' : 'Languages: ' . $languages;
+            $output->writeln($message);
         }
 
         return Command::SUCCESS;
