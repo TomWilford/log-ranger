@@ -19,9 +19,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Command\LockableTrait;
 
 /**
  * InputCommand is an example of different inputs in use.
+ *
+ * Please Note: This file is intended as a reference for development and should be removed before deployment.
  *
  * @author Tom Wilford <hello@jollyblueman.com>
  */
@@ -56,7 +59,7 @@ class InputCommand extends ConsoleCommand
      */
     protected function configure()
     {
-        $this->setHelp("Let me figure out the options first")
+        $this->setHelp("It's just a random bunch of questions really!")
             ->setHidden(false)
             ->setAliases(["console:test"])
             ->addArgument(
@@ -132,6 +135,7 @@ class InputCommand extends ConsoleCommand
         $this->switch = filter_var($input->getOption('switch'), FILTER_VALIDATE_INT);
         $this->number = filter_var($input->getOption('number'), FILTER_VALIDATE_INT);
 
+        // How to handle InputOption::VALUE_OPTIONAL
         $waffle = $input->getOption('waffle');
         if (false === $waffle) {
             // Option not passed
@@ -139,11 +143,11 @@ class InputCommand extends ConsoleCommand
             $this->waffle = true;
         } elseif (null === $waffle) {
             // Option passed with no value
-            // Knew they could specify but didn't... probably want waffle!!
+            // Knew they could specify but didn't say no... probably want waffle!!
             $this->waffle = true;
         } else {
             // Option passed with values
-            // Anything other than no means waffle!
+            // Anything other than no must mean waffle!!!
             $this->waffle = true;
             if ('no' === strtolower($waffle)) {
                 $this->waffle = false;
@@ -164,8 +168,9 @@ class InputCommand extends ConsoleCommand
     {
         $waffle = $this->waffle;
 
+        // Creating a custom style for output called 'php'
         $outputStyle = new OutputFormatterStyle('#4F5B93', '#8892BF', ['bold', 'blink']);
-        $output->getFormatter()->setStyle('truth', $outputStyle);
+        $output->getFormatter()->setStyle('php', $outputStyle);
 
         if (!$this->name && $waffle) {
             $output->writeln('<info>Your name is required for me to repeat it back to you.</info>');
@@ -173,7 +178,7 @@ class InputCommand extends ConsoleCommand
 
         if ($this->languages && $waffle) {
             if (str_contains($this->languages, 'php')) {
-                $output->writeln('<truth>A fine choice of languages!</truth>');
+                $output->writeln('<php>A fine choice of languages!</php>');
             }
         }
 
@@ -206,7 +211,6 @@ class InputCommand extends ConsoleCommand
         $switch    = $this->switch;;
         $languages = $this->languages;
 
-        // Output feedback
         if ($waffle) {
             $output->writeln(['Thanks for that!', 'Now lets see...']);
         }
@@ -249,6 +253,12 @@ class InputCommand extends ConsoleCommand
             $message = $waffle ? '<question>So you like ' .$languages . '?</question>' : 'Languages: ' . $languages;
             $output->writeln($message);
         }
+
+        // Example of a clickable link
+        $output->writeln([
+            '<info>Have you heard of this: <href=https://php.net>php.net</>?</info>',
+            '<comment>I think you\'ll love it!</comment>'
+        ]);
 
         return Command::SUCCESS;
     }

@@ -19,6 +19,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * GreetCommand is simple command example using ^php8 attributes.
  *
+ * Please Note: This file is intended as a reference for development and should be removed before deployment.
+ *
  * AsCommand() allows you to set:
  *      - name        = Defines how the command is called.
  *      - description = Used to explain the command in help pages.
