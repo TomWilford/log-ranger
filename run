@@ -11,12 +11,16 @@
 require __DIR__ . '/vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
+use Wilf\Console\Command\DefaultCommand;
 use Wilf\Console\Command\GreetCommand;
 use Wilf\Console\Command\InputCommand;
 use Wilf\Console\Command\OutputCommand;
 
-$app = new Application();
+$defaultCommand = new DefaultCommand(); // hidden command (php run console:default)
 
+$app = new Application();
+$app->add($defaultCommand); // php run
+$app->setDefaultCommand($defaultCommand->getName()); // overwrites the default command
 $app->add(new GreetCommand()); // php run console:greet
 $app->add(new InputCommand()); // php run console:input name* lastname languages[] --number --switch --??????
 $app->add(new OutputCommand()); // php run console:output

@@ -11,6 +11,7 @@ namespace Wilf\Console\Command;
 
 use Exception;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Cursor;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -212,7 +213,6 @@ class OutputCommand extends ConsoleCommand
         $message = $choice == "php" ? 'Give one of the others a go anyway!' : 'I\'ll take your word for it!';
         $io->text($message);
 
-        $io->text('And finally...');
         $io->section('Result Methods');
         $io->text('Success');
         $io->success('Hooray, the job completed successfully');
@@ -226,6 +226,18 @@ class OutputCommand extends ConsoleCommand
             '...and System32 has been deleted.',
             'Sorry about that!'
         ]);
+
+        $cursor = new Cursor($output);
+        $cursor->clearScreen();
+        $io->text('And finally...');
+        $io->title('Magic Cursor');
+        $cursor->moveToPosition(20, 4);
+        $output->writeln('Look over here!');
+        $cursor->moveDown(50);
+        $cursor->moveRight(10);
+        $output->writeln('You can clear the screen and lines; move the cursor around and output anywhere.');
+        $io->newLine();
+        $io->note('You can still scroll up to look through the previous output!');
 
         return Command::SUCCESS;
     }
