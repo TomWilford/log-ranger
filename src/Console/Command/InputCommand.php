@@ -187,7 +187,7 @@ class InputCommand extends ConsoleCommand
         }
 
         if (!$this->number && $waffle) {
-            $output->writeln(['<question>Go on, what\' your favourite number?</question>']);
+            $output->writeln(['<question>Go on, what\'s your favourite number?</question>']);
         }
 
         if (!$this->waffle) {
