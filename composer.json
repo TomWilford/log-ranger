@@ -1,0 +1,30 @@
+{
+    "name": "tomwilford/log-ranger",
+    "description": "Locate log lines in a date range.",
+    "keywords": [],
+    "homepage": "https://jollyblueman.com",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Tom Wilford",
+            "homepage": "https://jollyblueman.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "hello@jollyblueman.com"
+    },
+    "autoload": {
+        "psr-4": {
+            "TomWilf\\LogRanger\\": "src/LogRanger/",
+            "TomWilf\\Tests\\LogRanger\\": "tests/LogRanger/"
+        }
+    },
+    "require": {
+        "symfony/console": "^6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "zenstruck/console-test": "^1.3"
+    }
+}

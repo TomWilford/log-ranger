@@ -1,0 +1,28 @@
+#!/usr/bin/env php
+<?php
+/*
+ * Copyright (c) 2022. Tom Wilford <hello@jollyblueman.com>
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+require __DIR__ . '/vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+use TomWilf\LogRanger\Command\DefaultCommand;
+use TomWilf\LogRanger\Command\SearchCommand;
+
+$defaultCommand = new DefaultCommand(); // hidden command (php run log-ranger:default)
+
+$app = new Application();
+$app->add($defaultCommand); // php run
+$app->setDefaultCommand($defaultCommand->getName()); // overwrites the default command
+$app->add(new SearchCommand()); // php run log-ranger:search <name>
+
+try {
+    $app->run();
+} catch (Exception $e) {
+    echo "Unexpected Error: " . $e->getCode();
+}
